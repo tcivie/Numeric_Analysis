@@ -18,6 +18,8 @@ def Bisection_Method(polynome, distance, epsilon=0.0001):
             distance[1] = mid
         print(f'X{i} = {mid}')
         i += 1
+    if i == MAX_RUNS:
+        print("Error: Couldn't find the point due to max runs reached")
     return mid
 
 
