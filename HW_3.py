@@ -1,7 +1,12 @@
-MAX_RUNS = 100
+import mpmath.function_docs
+import sympy
+
+import math
+import sympy as sp
+from sympy.utilities.lambdify import lambdify
 
 
-def Bisection_Method(polynomial, distance, epsilon=0.0001):
+def Bisection_Method(polynomial, distance, epsilon=0.001):
     """
     Finds the root of the Polynomial using the bisection method
     :param polynomial: The Polynomial EX: lambda x: (x*x) - 4
@@ -9,20 +14,30 @@ def Bisection_Method(polynomial, distance, epsilon=0.0001):
     :param epsilon: The max distance to stop
     :return: The solution to the problem with epsilon as the max error
     """
-    mid = 0
-    i = 0
-    while abs(distance[0] - distance[1]) > epsilon and i < MAX_RUNS:
-        # Run till the distance between the points is the lowest or passed max runs
-        mid = (distance[0] + distance[1]) / 2
-        if polynomial(distance[0]) * polynomial(mid) > 0:
-            distance[0] = mid
-        else:
+    if polynomial(distance[0]) * polynomial(distance[1]) > 0: # if there is no root between 2 points.
+        return
+    max_Loops = -math.log(epsilon / (distance[1] - distance[0]), math.e) / math.log(2, math.e) # max loops
+    loop_Counter = 0
+    while loop_Counter <= max_Loops+1 and abs(distance[0] - distance[1]) >= epsilon:
+        # Run till the distance between the root is the lowest or passed max runs
+        mid = (distance[1] + distance[0]) / 2
+        if polynomial(distance[0]) * polynomial(distance[1]) == 0:
+            if polynomial(distance[0]) == 0:
+                return distance[0]
+            else:
+                return distance[1]
+        if (polynomial(distance[0]) * polynomial(mid)) <= 0:
             distance[1] = mid
-        print(f'X{i} = {mid}')
-        i += 1
-    if i == MAX_RUNS:
-        print("Error: Couldn't find the point due to max runs reached")
+        else:
+            distance[0] = mid
+        loop_Counter += 1
+    if loop_Counter == max_Loops+1:
+        print(f'The polynomial does not converge by bisection method. ran {loop_Counter} times ')
+        return
+    print(f'iterated for {loop_Counter} times until it found the root {mid}')
     return mid
+
+
 
 
 def Newton_Raphson(polynomial, distance, epsilon=0.0001):
@@ -33,7 +48,74 @@ def Newton_Raphson(polynomial, distance, epsilon=0.0001):
     :param epsilon: The error range
     :return:
     """
-    pass
+    x_r = distance[0]
+    x_r1 = x_r - polynomial(x_r) / polynomial_tag(x_r) # Newton raphson formula
+    max_Loops = -math.log(epsilon / (distance[1] - distance[0]), math.e) / math.log(2, math.e)  # max loops
+    loopCounter = 0
+    while abs(x_r-x_r1) >= epsilon and loopCounter < max_Loops + 1 and polynomial(x_r1) != 0:
+        x_r = x_r1
+        x_r1 = x_r - polynomial(x_r) / polynomial_tag(x_r)
+        loopCounter += 1
+    if loopCounter >= max_Loops + 1:
+        print("System does not converge with this range")
+        return
+    return x_r1
+
+# Ask about this one
+def Newton_Raphson_all_roots(polynomial,polynomial_tag,distance,epsilon = 0.0001):
+    '''
+    finds all possible roots between given range.
+    :param polynomial:
+    :param polynomial_tag:
+    :param distance:
+    :param epsilon:
+    :return: None
+    '''
+    roots = set()
+    x0 = distance[0] + 0.1
+    while x0 <= distance[1]:
+        temp = Newton_Raphson(polynomial, [distance[0], x0], epsilon)
+        temp2 = Newton_Raphson(polynomial_tag, [distance[0], x0], epsilon)
+        if temp is not None:
+            roots.add(temp)
+        if temp2 is not None and polynomial(temp2) == 0:
+            roots.add(temp2)
+        distance[0], x0 = x0, x0 + 0.1
+    [print(f'X{i}, {root}') for i, root in enumerate(roots)]
 
 
-print(Bisection_Method(lambda x: (x * x) - 4, [-1, 3]))
+
+def bisection_all_roots(polynomial,polynomial_tag, start_point, end_point, epsilon=0.0001):
+    '''
+    finds all roots between start_point and end_point using Bisection_Method on polynomial and polynomial_tag
+    :param polynomial: polynomial given
+    :param polynomial_tag: polynomial_tag
+    :param start_point: starting range
+    :param end_point: ending range
+    :param epsilon: tolerance
+    :return: None
+    '''
+    roots = []
+    x1 = start_point + 0.1
+    while x1 <= end_point:
+        temp = Bisection_Method(polynomial, [start_point, x1], epsilon) # Polynomial bisection
+        temp2 = Bisection_Method(polynomial_tag, [start_point, x1], epsilon) # Polynomial tag bisection
+        if temp is not None:
+            roots.append(temp)
+        if temp2 is not None and polynomial(temp2) == 0:
+            roots.append(temp2)
+        start_point, x1 = x1, x1 + 0.1
+    [print(f'X{i}, {root}') for i, root in enumerate(roots)]
+
+
+
+x = sp.symbols("x")
+polynomial = x**3 - x - 1
+polynomial_tag = sp.diff(polynomial)
+polynomial_tag = lambdify(x, polynomial_tag)
+polynomial = lambdify(x, polynomial)
+
+Newton_Raphson_all_roots(polynomial,polynomial_tag,[-1,10])
+
+
+
