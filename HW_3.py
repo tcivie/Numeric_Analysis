@@ -115,7 +115,28 @@ polynomial_tag = sp.diff(polynomial)
 polynomial_tag = lambdify(x, polynomial_tag)
 polynomial = lambdify(x, polynomial)
 
-Newton_Raphson_all_roots(polynomial,polynomial_tag,[-1,10])
+
+
+def secant_method(polynomial,epsilon = 0.0001):
+    '''
+    iterative method to find roots between given ranges by initiality guessing range.
+    building x2 = x1 - polynomial(x1) *
+    where x_r2 is built by guessing initial ranges x_r0 and x_r1
+    :param polynomial: polynom checked
+    :param range: array of starting_point at index 0 and ending_point and index 1
+    :param epsilon: error tolerance
+    :return:
+    '''
+    x0, x1 = 1, 2 # initial guess
+    loop_counter = 0
+    max_Loops = 50 # max loops
+    while abs(x1 - x0) > epsilon and loop_counter <= max_Loops: # while absolute value of xk_1 - xk_0 bigger than epsilon or loop counter reached max
+        x2 = x1 - (polynomial(x1) * (x1 - x0)) / (polynomial(x1) - polynomial(x0)) # x1 - a good estimation for f_tag.
+        x0 = x1
+        x1 = x2
+
+    print(f'{x2} is a root for this function. ')
 
 
 
+secant_method(polynomial)
