@@ -14,11 +14,11 @@ def Bisection_Method(polynomial, distance, epsilon=0.0001):
     :param epsilon: The max distance to stop
     :return: The solution to the problem with epsilon as the max error
     """
-    if polynomial(distance[0]) * polynomial(distance[1]) > 0: # if there is no root between 2 points.
+    if polynomial(distance[0]) * polynomial(distance[1]) > 0:  # if there is no root between 2 points.
         return
-    max_Loops = -math.log(epsilon / (distance[1] - distance[0]), math.e) / math.log(2, math.e) # max loops
+    max_Loops = -math.log(epsilon / (distance[1] - distance[0]), math.e) / math.log(2, math.e)  # max loops
     loop_Counter = 0
-    while loop_Counter <= max_Loops+2 and abs(distance[0] - distance[1]) >= epsilon:
+    while loop_Counter <= max_Loops + 2 and abs(distance[0] - distance[1]) >= epsilon:
         # Run till the distance between the root is the lowest or passed max runs
         mid = (distance[1] + distance[0]) / 2
         if polynomial(distance[0]) * polynomial(distance[1]) == 0:
@@ -37,8 +37,7 @@ def Bisection_Method(polynomial, distance, epsilon=0.0001):
     return mid, loop_Counter
 
 
-
-def bisection_all_roots(polynomial,polynomial_tag, start_point, end_point, epsilon=0.0001):
+def bisection_all_roots(polynomial, polynomial_tag, start_point, end_point, epsilon=0.0001):
     '''
     finds all roots between start_point and end_point using Bisection_Method on polynomial and polynomial_tag
     :param polynomial: polynomial given
@@ -51,8 +50,8 @@ def bisection_all_roots(polynomial,polynomial_tag, start_point, end_point, epsil
     roots = []
     x1 = start_point + 0.1
     while x1 <= end_point:
-        temp = Bisection_Method(polynomial, [start_point, x1], epsilon) # Polynomial bisection
-        temp2 = Bisection_Method(polynomial_tag, [start_point, x1], epsilon) # Polynomial tag bisection
+        temp = Bisection_Method(polynomial, [start_point, x1], epsilon)  # Polynomial bisection
+        temp2 = Bisection_Method(polynomial_tag, [start_point, x1], epsilon)  # Polynomial tag bisection
         if temp is not None:
             print(f'iterated for {temp[1]} times until it found the root {temp[0]}')
             roots.append(temp[0])
@@ -74,21 +73,27 @@ def Newton_Raphson(polynomial, distance, epsilon=0.0001):
     """
     if polynomial(distance[0]) * polynomial(distance[1]) > 0:
         return
+
+    if abs(polynomial_tag(distance[0])) < epsilon:  # Check if one of the sides is really close to the 0
+        return distance[0], 0
+    elif abs(polynomial_tag(distance[1])) < epsilon:
+        return distance[1], 0
+
     x_r = distance[0]
-    x_r1 = x_r - polynomial(x_r) / polynomial_tag(x_r) # Newton raphson formula
-    max_Loops = 50 # max loops
+    x_r1 = x_r - polynomial(x_r) / polynomial_tag(x_r)  # Newton raphson formula
+    max_Loops = 50  # max loops
     loopCounter = 0
     while abs(x_r - x_r1) >= epsilon and loopCounter < max_Loops + 1 and polynomial(x_r1) != 0:
-        x_r = x_r1
         x_r1 = x_r - polynomial(x_r) / polynomial_tag(x_r)
+        x_r = x_r1
         loopCounter += 1
     if loopCounter >= int(max_Loops + 1):
         return
-    return x_r1,loopCounter
+    return x_r1, loopCounter
 
 
 # Ask about this one
-def Newton_Raphson_all_roots(polynomial, polynomial_tag, distance, epsilon = 0.0001):
+def Newton_Raphson_all_roots(polynomial, polynomial_tag, distance, epsilon=0.0001):
     '''
     finds all possible roots between given range.
     :param polynomial:
@@ -115,13 +120,7 @@ def Newton_Raphson_all_roots(polynomial, polynomial_tag, distance, epsilon = 0.0
         print("There are no roots in given range. ")
 
 
-
-
-
-
-
-
-def secant_method(polynomial, epsilon = 0.0001):
+def secant_method(polynomial, epsilon=0.0001):
     '''
     iterative method to find roots between given ranges by initiality guessing range.
     building x2 = x1 - polynomial(x1) *
@@ -141,14 +140,17 @@ def secant_method(polynomial, epsilon = 0.0001):
         except ValueError:
             print("Invalid point. Please try again")
     loop_counter = 0
-    max_Loops = 50 # max loops
-    while abs(x1 - x0) > epsilon and loop_counter <= max_Loops: # while absolute value of xk_1 - xk_0 bigger than epsilon or loop counter reached max
-        x2 = x1 - (polynomial(x1) * (x1 - x0)) / (polynomial(x1) - polynomial(x0)) # x1 - a good estimation for f_tag.
+    max_Loops = 50  # max loops
+    while abs(
+            x1 - x0) > epsilon and loop_counter <= max_Loops:  # while absolute value of xk_1 - xk_0 bigger than epsilon or loop counter reached max
+        x2 = x1 - (polynomial(x1) * (x1 - x0)) / (polynomial(x1) - polynomial(x0))  # x1 - a good estimation for f_tag.
         x0 = x1
         x1 = x2
     if loop_counter == max_Loops:
         return
     print(f'{x2} is a root for this equation')
+
+
 #
 # def secant_method_all_roots(polynomial, polynomial_tag, distance, epsilon = 0.0001):
 #     x0, x1 = distance[0], distance[0] + 0.1
@@ -165,7 +167,7 @@ def secant_method(polynomial, epsilon = 0.0001):
 #         [print(f'X{i}, {root}') for i, root in enumerate(roots)]
 
 
- # Main
+# Main
 if __name__ == "__main__":
     '''
     User interactive program that builds a polynomial depending on user input, and finds roots of
@@ -175,13 +177,13 @@ if __name__ == "__main__":
     temp = 0
     while n == 0 and temp == 0:
         try:
-            n = int(input("Please enter polynomial degree\n"))
+            n = int(input("Please enter polynomial degree: "))
         except ValueError:
             n = 0
             print("You must enter an integer")
     while True:
         try:
-            temp = [float(input(f'Enter degree {i} coefficient')) for i in range(n, -1, -1)]
+            temp = [float(input(f'Enter degree {i} coefficient: ')) for i in range(n, -1, -1)]
             break
         except ValueError:
             temp = 0
@@ -190,14 +192,16 @@ if __name__ == "__main__":
     x = sp.symbols("x")
     polynomial = 0
     for coefficient in temp:
-        polynomial += coefficient * ((x)**n)
-        n = n-1
+        polynomial += coefficient * ((x) ** n)
+        n = n - 1
+    print(polynomial)
     polynomial_tag = sp.diff(polynomial)
     polynomial = lambdify(x, polynomial)
     polynomial_tag = lambdify(x, polynomial_tag)
     while True:
         try:
-            x = int(input("Which method would you like to use to find roots ?\n1. Bisection Method \n2. Newton-Raphson Method\n 3.Secant method"))
+            x = int(input(
+                "Which method would you like to use to find roots ?\n1. Bisection Method \n2. Newton-Raphson Method\n3. Secant method\n"))
             break
         except ValueError:
             print("Invalid choice. Please try again. ")
@@ -206,8 +210,8 @@ if __name__ == "__main__":
             secant_method(polynomial)
             break
         try:
-            start_point = float(input("Choose starting point"))
-            end_point = float(input("Choose ending point"))
+            start_point = float(input("Choose starting point\n"))
+            end_point = float(input("Choose ending point\n"))
             break
         except ValueError:
             print("invalid point. Please try again")
@@ -215,5 +219,4 @@ if __name__ == "__main__":
     if x == 1:
         bisection_all_roots(polynomial, polynomial_tag, start_point, end_point)
     if x == 2:
-        Newton_Raphson_all_roots(polynomial,polynomial_tag,[start_point,end_point])
-
+        Newton_Raphson_all_roots(polynomial, polynomial_tag, [start_point, end_point])
