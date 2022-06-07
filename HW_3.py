@@ -56,7 +56,7 @@ def bisection_all_roots(polynomial, polynomial_tag, start_point, end_point, epsi
             print(f'iterated for {temp[1]} times until it found the root {temp[0]}')
             roots.append(temp[0])
 
-        if temp2 is not None and polynomial(temp2[0]) <= epsilon:
+        if temp2 is not None and abs(polynomial(temp2[0])) <= epsilon:
             print(f'iterated for {temp2[1]} times until it found the root {temp2[0]}')
             roots.append(temp2[0])
         start_point, x1 = x1, x1 + 0.1
